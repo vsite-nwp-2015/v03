@@ -4,6 +4,9 @@
 
 class MyDialog : public Dialog 
 {
+public:
+	POINT p;
+	
 protected:
 	int IDD()
 	{ 
@@ -11,26 +14,49 @@ protected:
 	}
 	bool OnInitDialog()
 	{
-		// TODO: set initial values to edit controls
+		Postavi(IDC_EDIT1, IDC_EDIT2, p.x, p.y);
 		return true;
 	}
 	bool OnOK()
 	{
-		// TODO: get current values from edit controls
-		// TODO: if not valid return false
-		return true;
+		bool flag=true;
+		try {
+			p.x = GetInt(IDC_EDIT1);
+		}
+		catch (XCtrl ex)
+		{
+			p.x = 0;
+			flag = false;
+		}
+		try {
+			p.y = GetInt(IDC_EDIT2);
+		}
+		catch (XCtrl ex)
+		{
+			p.y = 0;
+			flag = false;
+		}
+		Postavi(IDC_EDIT1, IDC_EDIT2, p.x, p.y);
+		return flag;
 	}
-	void OnCancel()	{ }
+	void OnCancel()	{ EndDialog(*this, 2); }
 	bool OnCommand(int id, int code) { return false; }
+private:
+	void Postavi(int id1, int id2, int value1, int value2) {
+		SetInt(id1, value1); 
+		SetInt(id2, value2);
+	}
+
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hp, LPSTR cmdLine, int nShow)
 {
 	MyDialog dlg;
-	// TODO: find current mouse position and transfer to dialog
+	GetCursorPos(&dlg.p);
 	if(dlg.DoModal(hInstance, NULL) == IDOK)
 	{
-		// TODO: set mouse position to coordinates from dialog
+		SetCursorPos(dlg.p.x, dlg.p.y);
+		EndDialog(dlg, 1);
 	}
 	return 0;
 }
